@@ -7,6 +7,15 @@
         "@playwright/mcp@latest"
       ],
       "env": {}
+    },
+    "shrimp-task-manager": {
+      "command": "node",
+      "args": ["/Users/juhyunlee/workspace/mcp-shrimp-task-manager/dist/index.js"],
+      "env": {
+        "DATA_DIR": "/Users/juhyunlee/workspace/claude/milestone/shrimp_data",
+        "TEMPLATES_USE": "en",
+        "ENABLE_GUI": "false"
+      }
     }
   }
 }

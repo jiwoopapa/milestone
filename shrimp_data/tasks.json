@@ -1,0 +1,516 @@
+{
+  "tasks": [
+    {
+      "id": "45db468a-f66d-4eae-a5b5-fec2aa87a7a3",
+      "name": "[Phase 1-1] Supabase 환경 설정 및 패키지 설치",
+      "description": "Supabase 프로젝트 연동을 위한 패키지 설치와 환경변수 설정. @supabase/ssr, @supabase/supabase-js 설치 후 .env.local에 NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY 등록.",
+      "notes": ".env.local은 절대 커밋하지 않을 것. Supabase 프로젝트는 사용자가 콘솔에서 직접 생성해야 함.",
+      "status": "pending",
+      "dependencies": [],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": ".env.local",
+          "type": "CREATE",
+          "description": "Supabase 환경변수"
+        },
+        {
+          "path": ".env.example",
+          "type": "CREATE",
+          "description": "환경변수 템플릿"
+        },
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "Supabase 패키지 추가"
+        }
+      ],
+      "implementationGuide": "1. npm install @supabase/ssr @supabase/supabase-js\n2. .env.local 파일 생성 (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)\n3. .env.example 파일 생성 (키 값 제외한 변수명만 포함)\n4. .gitignore에 .env.local 포함 여부 확인",
+      "verificationCriteria": "npm run dev 정상 실행, .env.local에 Supabase URL/Key 존재, .env.local이 .gitignore에 포함됨",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "a9633856-340b-407c-b2c1-d8c66007948d",
+      "name": "[Phase 1-2] DB 스키마 설계 및 마이그레이션",
+      "description": "Supabase PostgreSQL에 앱 전체 테이블 생성. users(프로필), routines(루틴 정의), routine_logs(완료 기록), goals(목표), goal_logs(달성 기록), events(가족 일정) 테이블 및 기본 RLS 정책 적용.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "45db468a-f66d-4eae-a5b5-fec2aa87a7a3"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "supabase/migrations/001_initial_schema.sql",
+          "type": "CREATE",
+          "description": "전체 DB 스키마 SQL"
+        },
+        {
+          "path": "types/index.ts",
+          "type": "TO_MODIFY",
+          "description": "DB 테이블 대응 TypeScript 타입 추가"
+        }
+      ],
+      "implementationGuide": "supabase/migrations/001_initial_schema.sql 파일 생성:\n- users: id(uuid, FK auth.users), name, avatar_url, created_at\n- routines: id, user_id(FK), title, time_slot(ENUM: morning/commute/evening), repeat_type(ENUM: daily/weekdays/custom), repeat_days(int[]), is_active, created_at\n- routine_logs: id, routine_id(FK), user_id(FK), completed_at(date), created_at\n- goals: id, user_id(FK), title, unit, target_value(numeric), current_value(numeric), start_date, end_date, created_at\n- goal_logs: id, goal_id(FK), user_id(FK), value(numeric), logged_at(date), note, created_at\n- events: id, user_id(FK), title, event_date, category(ENUM: hiking/camping/other), created_at\n- 각 테이블에 RLS enable + user_id = auth.uid() 기본 정책 추가",
+      "verificationCriteria": "Supabase 콘솔에서 6개 테이블 확인 가능, RLS 활성화 상태 확인, types/index.ts에 Routine/RoutineLog/Goal/GoalLog/Event 타입 정의됨",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "e24063bf-2480-4f32-98c6-279b81f9f655",
+      "name": "[Phase 1-3] Next.js 미들웨어 및 라우트 구조 설정",
+      "description": "인증 보호 라우트를 위한 middleware.ts 작성과 app/(auth)/, app/(app)/ 라우트 그룹 빈 페이지 생성. 미로그인 시 /login 리다이렉트, 로그인 시 /dashboard 접근 허용.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "45db468a-f66d-4eae-a5b5-fec2aa87a7a3"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "middleware.ts",
+          "type": "CREATE",
+          "description": "인증 보호 미들웨어"
+        },
+        {
+          "path": "app/(auth)/login/page.tsx",
+          "type": "CREATE",
+          "description": "로그인 페이지"
+        },
+        {
+          "path": "app/(auth)/signup/page.tsx",
+          "type": "CREATE",
+          "description": "회원가입 페이지"
+        },
+        {
+          "path": "app/(auth)/layout.tsx",
+          "type": "CREATE",
+          "description": "인증 레이아웃"
+        },
+        {
+          "path": "app/(app)/dashboard/page.tsx",
+          "type": "CREATE",
+          "description": "대시보드 페이지"
+        },
+        {
+          "path": "app/(app)/goals/page.tsx",
+          "type": "CREATE",
+          "description": "목표 트래커 페이지"
+        },
+        {
+          "path": "app/(app)/calendar/page.tsx",
+          "type": "CREATE",
+          "description": "캘린더 페이지"
+        },
+        {
+          "path": "app/(app)/settings/page.tsx",
+          "type": "CREATE",
+          "description": "설정 페이지"
+        },
+        {
+          "path": "app/(app)/layout.tsx",
+          "type": "CREATE",
+          "description": "앱 레이아웃"
+        }
+      ],
+      "implementationGuide": "1. middleware.ts: @supabase/ssr의 createServerClient로 세션 확인\n   - /dashboard, /goals, /calendar, /settings 요청 시 세션 없으면 /login 리다이렉트\n   - /login, /signup 요청 시 세션 있으면 /dashboard 리다이렉트\n2. app/(auth)/login/page.tsx: 빈 페이지 (LoginForm 추후 삽입)\n3. app/(auth)/signup/page.tsx: 빈 페이지\n4. app/(auth)/layout.tsx: 인증 페이지 레이아웃\n5. app/(app)/dashboard/page.tsx: 빈 페이지\n6. app/(app)/goals/page.tsx: 빈 페이지\n7. app/(app)/calendar/page.tsx: 빈 페이지\n8. app/(app)/settings/page.tsx: 빈 페이지\n9. app/(app)/layout.tsx: 빈 레이아웃 (AppSidebar 추후 삽입)",
+      "verificationCriteria": "미로그인 상태에서 /dashboard 접근 시 /login으로 리다이렉트됨, 로그인 상태에서 /dashboard 정상 접근, npm run dev 오류 없음",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "47c68c5c-3601-40d3-b735-3906ef5edb18",
+      "name": "[Phase 2-1] Supabase 클라이언트 유틸 및 날짜 헬퍼",
+      "description": "서버/클라이언트 컴포넌트 분리를 위한 Supabase 유틸 파일 2개 생성과 date-fns 기반 날짜 헬퍼 함수 작성.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "e24063bf-2480-4f32-98c6-279b81f9f655"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "lib/supabase/server.ts",
+          "type": "CREATE",
+          "description": "서버 컴포넌트용 Supabase 클라이언트"
+        },
+        {
+          "path": "lib/supabase/client.ts",
+          "type": "CREATE",
+          "description": "클라이언트 컴포넌트용 Supabase 클라이언트"
+        },
+        {
+          "path": "lib/date.ts",
+          "type": "CREATE",
+          "description": "date-fns 기반 날짜 헬퍼"
+        },
+        {
+          "path": "package.json",
+          "type": "REFERENCE",
+          "description": "date-fns 이미 설치됨 확인"
+        }
+      ],
+      "implementationGuide": "1. lib/supabase/server.ts: createServerClient(@supabase/ssr) — cookies()로 세션 관리\n2. lib/supabase/client.ts: createBrowserClient(@supabase/ssr) — 싱글톤 패턴\n3. lib/date.ts:\n   - formatDate(date, format): date-fns format 래퍼\n   - getToday(): 오늘 날짜 Date 반환\n   - isSameDay(a, b): 같은 날짜 비교\n   - getDaysInMonth(year, month): 월 전체 날짜 배열\n   - formatRelative(date): '오늘', '어제', 'n일 전' 반환",
+      "verificationCriteria": "lib/supabase/server.ts, client.ts 각각 import 가능, lib/date.ts 함수 정상 동작",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "abaf3c48-5234-4876-a197-1cb7cd962e71",
+      "name": "[Phase 2-2] 인증 컴포넌트 및 공통 데이터 훅",
+      "description": "LoginForm, SignupForm 컴포넌트와 useUser, useRoutines, useGoals 훅 구현. 기존 lib/validations.ts의 loginFormSchema, registerFormSchema 재활용.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "47c68c5c-3601-40d3-b735-3906ef5edb18"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "lib/validations.ts",
+          "type": "REFERENCE",
+          "description": "loginFormSchema, registerFormSchema 재사용"
+        },
+        {
+          "path": "components/organisms/LoginForm.tsx",
+          "type": "CREATE",
+          "description": "로그인 폼 컴포넌트"
+        },
+        {
+          "path": "components/organisms/SignupForm.tsx",
+          "type": "CREATE",
+          "description": "회원가입 폼 컴포넌트"
+        },
+        {
+          "path": "hooks/useUser.ts",
+          "type": "CREATE",
+          "description": "인증 사용자 훅"
+        },
+        {
+          "path": "hooks/useRoutines.ts",
+          "type": "CREATE",
+          "description": "루틴 CRUD 훅"
+        },
+        {
+          "path": "hooks/useGoals.ts",
+          "type": "CREATE",
+          "description": "목표 CRUD 훅"
+        }
+      ],
+      "implementationGuide": "1. components/organisms/LoginForm.tsx:\n   - useForm + zodResolver(loginFormSchema)\n   - supabase.auth.signInWithPassword() 호출\n   - 성공 시 router.push('/dashboard')\n2. components/organisms/SignupForm.tsx:\n   - useForm + zodResolver(registerFormSchema)\n   - supabase.auth.signUp() 호출\n3. hooks/useUser.ts:\n   - supabase.auth.getUser() + onAuthStateChange 구독\n   - user, loading, signOut 반환\n4. hooks/useRoutines.ts:\n   - routines 목록 조회, 추가(create), 수정(update), 삭제(remove)\n   - 오늘 날짜 기준 routine_logs 조회, 완료 처리(toggleComplete)\n5. hooks/useGoals.ts:\n   - goals 목록 조회, CRUD\n   - goal_logs 추가(addLog), 목표별 통계 계산",
+      "verificationCriteria": "로그인/로그아웃 정상 동작, useUser() 훅에서 사용자 정보 반환 확인",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "9457040d-c093-440d-ae9c-24825f78568b",
+      "name": "[Phase 2-3] 앱 레이아웃 컴포넌트",
+      "description": "AppSidebar, AppHeader 컴포넌트 구현 및 app/(app)/layout.tsx에 DashboardLayout 적용. 네비게이션 링크는 lib/constants.ts에 추가.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "abaf3c48-5234-4876-a197-1cb7cd962e71"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "lib/constants.ts",
+          "type": "TO_MODIFY",
+          "description": "appNavLinks 추가"
+        },
+        {
+          "path": "components/organisms/AppSidebar.tsx",
+          "type": "CREATE",
+          "description": "앱 사이드바"
+        },
+        {
+          "path": "components/organisms/AppHeader.tsx",
+          "type": "CREATE",
+          "description": "앱 헤더"
+        },
+        {
+          "path": "app/(app)/layout.tsx",
+          "type": "TO_MODIFY",
+          "description": "DashboardLayout 적용"
+        },
+        {
+          "path": "app/(auth)/login/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "LoginForm 삽입"
+        },
+        {
+          "path": "app/(auth)/signup/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "SignupForm 삽입"
+        }
+      ],
+      "implementationGuide": "1. lib/constants.ts에 appNavLinks 추가: dashboard/goals/calendar/settings\n2. components/organisms/AppSidebar.tsx:\n   - appNavLinks 기반 네비게이션\n   - 현재 경로 활성 표시 (usePathname)\n   - 로그아웃 버튼 (useUser의 signOut)\n   - 모바일: Sheet 컴포넌트로 드로어\n3. components/organisms/AppHeader.tsx:\n   - 현재 날짜 표시 (lib/date.ts 활용)\n   - 사용자 아바타/이름 (useUser)\n   - ThemeToggle 포함\n4. app/(app)/layout.tsx:\n   - AppSidebar + AppHeader로 DashboardLayout 구성\n   - Shadcn: npx shadcn@latest add sheet avatar",
+      "verificationCriteria": "AppSidebar에서 각 페이지로 이동 가능, 현재 경로 활성 표시, 로그아웃 동작, 모바일 드로어 정상 동작",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "823a72ad-c771-436a-ac2c-ba9186325d17",
+      "name": "[Phase 3-1] 루틴 대시보드",
+      "description": "아침/이동/저녁 시간대별 체크리스트 대시보드 구현. 루틴 CRUD 다이얼로그, 완료 처리(routine_logs 저장), 날짜 이동으로 과거 기록 조회.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "9457040d-c093-440d-ae9c-24825f78568b"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "lib/validations.ts",
+          "type": "TO_MODIFY",
+          "description": "routineFormSchema 추가"
+        },
+        {
+          "path": "lib/constants.ts",
+          "type": "TO_MODIFY",
+          "description": "TIME_SLOTS, REPEAT_TYPES 상수 추가"
+        },
+        {
+          "path": "hooks/useRoutines.ts",
+          "type": "TO_MODIFY",
+          "description": "날짜 파라미터 지원 추가"
+        },
+        {
+          "path": "components/organisms/RoutineFormDialog.tsx",
+          "type": "CREATE",
+          "description": "루틴 CRUD 다이얼로그"
+        },
+        {
+          "path": "components/organisms/RoutineCheckList.tsx",
+          "type": "CREATE",
+          "description": "시간대별 체크리스트"
+        },
+        {
+          "path": "app/(app)/dashboard/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "대시보드 페이지 구현"
+        }
+      ],
+      "implementationGuide": "1. lib/validations.ts에 routineFormSchema 추가 (title, time_slot, repeat_type, repeat_days)\n2. lib/constants.ts에 TIME_SLOTS, REPEAT_TYPES 상수 추가\n3. components/organisms/RoutineFormDialog.tsx: 루틴 추가/수정 다이얼로그\n4. components/organisms/RoutineCheckList.tsx: 시간대별 체크리스트 섹션\n   - 완료율 표시 (N/M)\n   - 체크박스 클릭 → useRoutines.toggleComplete()\n5. app/(app)/dashboard/page.tsx:\n   - DateNavigator(날짜 이동) + 3개 시간대 섹션\n   - selectedDate state로 과거 기록 조회\n   - 루틴 추가 버튼 → RoutineFormDialog\n6. Shadcn 추가: npx shadcn@latest add dialog checkbox progress",
+      "verificationCriteria": "루틴 등록 후 시간대별 표시, 체크 상태 새로고침 후 유지, 날짜 이동으로 과거 기록 조회, 완료율 정확히 표시",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "3c44f9f4-17f8-4ea4-b4d6-29e049b78c3c",
+      "name": "[Phase 3-2] Goal Tracker",
+      "description": "장기 목표 등록/관리, 달성 기록 수동 입력, 진척도 시각화(진행 바 + 누적 그래프), 월간/전체 통계 카드 구현.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "9457040d-c093-440d-ae9c-24825f78568b"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "lib/validations.ts",
+          "type": "TO_MODIFY",
+          "description": "goalFormSchema, goalLogFormSchema 추가"
+        },
+        {
+          "path": "hooks/useGoals.ts",
+          "type": "TO_MODIFY",
+          "description": "통계 계산 로직 추가"
+        },
+        {
+          "path": "components/organisms/GoalFormDialog.tsx",
+          "type": "CREATE",
+          "description": "목표 CRUD 다이얼로그"
+        },
+        {
+          "path": "components/organisms/GoalLogDialog.tsx",
+          "type": "CREATE",
+          "description": "달성 기록 입력 다이얼로그"
+        },
+        {
+          "path": "components/organisms/GoalProgressCard.tsx",
+          "type": "CREATE",
+          "description": "목표 진척도 카드"
+        },
+        {
+          "path": "app/(app)/goals/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "Goal Tracker 페이지 구현"
+        }
+      ],
+      "implementationGuide": "1. lib/validations.ts에 goalFormSchema, goalLogFormSchema 추가\n2. components/organisms/GoalFormDialog.tsx: 목표 추가/수정 (title, unit, target_value, start_date, end_date)\n3. components/organisms/GoalLogDialog.tsx: 달성 기록 입력 (value, logged_at, note)\n4. components/organisms/GoalProgressCard.tsx:\n   - Progress 바 (current_value / target_value)\n   - 누적 그래프 (Shadcn chart 또는 recharts)\n   - 월간/전체 통계 요약\n5. app/(app)/goals/page.tsx:\n   - 목표 카드 목록\n   - 목표 추가 버튼 → GoalFormDialog\n   - 각 목표 카드에 기록 추가 버튼 → GoalLogDialog\n6. Shadcn 추가: npx shadcn@latest add chart",
+      "verificationCriteria": "목표 등록 후 진행 바 반영, 기록 추가 시 그래프 실시간 업데이트, 월간/전체 통계 카드 정상 표시",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "0f258c44-3057-4d6f-8e2e-324ec6c7f5dd",
+      "name": "[Phase 4-1] Markdown Export (Obsidian 연동)",
+      "description": "완료된 루틴 + 목표 기록을 Obsidian ACE 프레임워크 형식의 마크다운으로 변환하여 다운로드 또는 클립보드 복사.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "823a72ad-c771-436a-ac2c-ba9186325d17"
+        },
+        {
+          "taskId": "3c44f9f4-17f8-4ea4-b4d6-29e049b78c3c"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "lib/markdown.ts",
+          "type": "CREATE",
+          "description": "Markdown 변환 유틸"
+        },
+        {
+          "path": "components/organisms/MarkdownExportDialog.tsx",
+          "type": "CREATE",
+          "description": "Markdown Export 다이얼로그"
+        },
+        {
+          "path": "app/(app)/settings/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "Export 기능 추가"
+        }
+      ],
+      "implementationGuide": "1. lib/markdown.ts:\n   - generateMarkdown(routineLogs, goalLogs, dateRange): ACE 형식 MD 문자열 생성\n   - ACE 구조: Achievements(달성) / Challenges(도전) / Experiences(경험)\n2. components/organisms/MarkdownExportDialog.tsx:\n   - 날짜 범위 선택 (DatePicker)\n   - 미리보기 텍스트 영역\n   - 다운로드 버튼 (Blob + URL.createObjectURL)\n   - 클립보드 복사 버튼\n3. app/(app)/settings/page.tsx 또는 dashboard에 Export 버튼 추가",
+      "verificationCriteria": "날짜 범위 선택 후 MD 파일 다운로드, Obsidian에서 정상 렌더링, 클립보드 복사 동작",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "881c1b26-d944-4127-aa7d-10a25bffb13f",
+      "name": "[Phase 4-2] 가족 이벤트 캘린더",
+      "description": "월간 캘린더 뷰, 가족 이벤트 CRUD(산행/캠핑/기타), 루틴 완료 현황 오버레이 구현.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "823a72ad-c771-436a-ac2c-ba9186325d17"
+        },
+        {
+          "taskId": "3c44f9f4-17f8-4ea4-b4d6-29e049b78c3c"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "lib/validations.ts",
+          "type": "TO_MODIFY",
+          "description": "eventFormSchema 추가"
+        },
+        {
+          "path": "hooks/useEvents.ts",
+          "type": "CREATE",
+          "description": "이벤트 CRUD 훅"
+        },
+        {
+          "path": "components/organisms/CalendarView.tsx",
+          "type": "CREATE",
+          "description": "월간 캘린더 컴포넌트"
+        },
+        {
+          "path": "components/organisms/EventFormDialog.tsx",
+          "type": "CREATE",
+          "description": "이벤트 CRUD 다이얼로그"
+        },
+        {
+          "path": "app/(app)/calendar/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "캘린더 페이지 구현"
+        }
+      ],
+      "implementationGuide": "1. lib/validations.ts에 eventFormSchema 추가 (title, event_date, category)\n2. hooks/useEvents.ts: events 테이블 CRUD\n3. components/organisms/CalendarView.tsx:\n   - 월간 그리드 (date-fns getDaysInMonth 활용)\n   - 날짜 셀에 이벤트 뱃지 표시\n   - 루틴 완료율 색상 오버레이 (낮음/중간/높음)\n   - 날짜 클릭 → 이벤트 목록 + 추가 버튼\n4. components/organisms/EventFormDialog.tsx: 이벤트 추가/수정\n5. app/(app)/calendar/page.tsx: 월 이동 네비게이션 + CalendarView",
+      "verificationCriteria": "이벤트 추가/수정/삭제 가능, 루틴 완료 현황 오버레이 표시, 월 이동 정상 동작",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "245edba9-7627-4657-b951-d6019088dfd4",
+      "name": "[Phase 4-3] AI 코칭 (Claude API 연동)",
+      "description": "루틴 미완료 패턴 분석 및 일정 재조정 제안을 위한 Claude API 연동. Vercel AI SDK 스트리밍 응답 처리.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "0f258c44-3057-4d6f-8e2e-324ec6c7f5dd"
+        },
+        {
+          "taskId": "881c1b26-d944-4127-aa7d-10a25bffb13f"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "lib/claude.ts",
+          "type": "CREATE",
+          "description": "Claude API 프롬프트 생성 유틸"
+        },
+        {
+          "path": "app/api/coaching/route.ts",
+          "type": "CREATE",
+          "description": "AI 코칭 Route Handler"
+        },
+        {
+          "path": "components/organisms/AiCoachingPanel.tsx",
+          "type": "CREATE",
+          "description": "AI 코칭 UI 패널"
+        },
+        {
+          "path": "app/(app)/dashboard/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "AiCoachingPanel 추가"
+        },
+        {
+          "path": ".env.local",
+          "type": "TO_MODIFY",
+          "description": "ANTHROPIC_API_KEY 추가"
+        }
+      ],
+      "implementationGuide": "1. npm install ai @anthropic-ai/sdk\n2. lib/claude.ts: 루틴 데이터 → 분석 프롬프트 생성 함수\n3. app/api/coaching/route.ts (Route Handler):\n   - 주간 루틴 달성률 데이터 수신\n   - Vercel AI SDK streamText로 Claude API 호출\n   - 스트리밍 응답 반환\n4. components/organisms/AiCoachingPanel.tsx:\n   - 주간 달성률 요약 표시\n   - AI 분석 요청 버튼\n   - useChat 또는 fetch stream으로 텍스트 스트리밍 렌더링\n5. app/(app)/dashboard/page.tsx에 AiCoachingPanel 추가\n6. .env.local에 ANTHROPIC_API_KEY 추가",
+      "verificationCriteria": "루틴 데이터 기반 AI 분석 텍스트 스트리밍 렌더링, 클라이언트에서 직접 API 호출 없이 Route Handler 경유",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    },
+    {
+      "id": "6bb64c83-355a-4ea4-9734-bb4d72ca15bb",
+      "name": "[Phase 5] 최적화 및 Vercel 배포",
+      "description": "Vercel 배포 설정, Supabase RLS 강화, React Query 캐싱, 이미지/폰트 최적화, Lighthouse 90+ 달성, E2E 핵심 플로우 테스트.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "245edba9-7627-4657-b951-d6019088dfd4"
+        }
+      ],
+      "createdAt": "2026-04-01T14:26:29.093Z",
+      "updatedAt": "2026-04-01T14:26:29.093Z",
+      "relatedFiles": [
+        {
+          "path": "supabase/migrations/002_rls_policies.sql",
+          "type": "CREATE",
+          "description": "세분화된 RLS 정책"
+        },
+        {
+          "path": "next.config.ts",
+          "type": "TO_MODIFY",
+          "description": "이미지 도메인 최적화 설정"
+        },
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "React Query 패키지 추가"
+        }
+      ],
+      "implementationGuide": "1. npm install @tanstack/react-query — useRoutines/useGoals 훅을 React Query로 마이그레이션\n2. supabase/migrations/002_rls_policies.sql: 각 테이블 세분화된 RLS 정책 (SELECT/INSERT/UPDATE/DELETE 분리)\n3. next.config.ts: images.remotePatterns에 Supabase storage 도메인 추가\n4. Vercel 프로젝트 생성, 환경변수 등록 (NEXT_PUBLIC_SUPABASE_URL, ANON_KEY, ANTHROPIC_API_KEY)\n5. Lighthouse CI 실행, Performance/Accessibility 90+ 확인\n6. E2E 시나리오 수동 테스트: 회원가입 → 루틴 등록 → 체크 완료 → 목표 기록 → AI 코칭",
+      "verificationCriteria": "Vercel 프로덕션 URL로 전체 기능 동작, Lighthouse Performance 90+, Accessibility 90+, RLS 활성화 상태에서 타 사용자 데이터 접근 차단",
+      "analysisResult": "ROADMAP.md 기반 AI 습관 & 루틴 관리 웹앱. Next.js 16 App Router + Supabase + Tailwind CSS v4 + Shadcn/UI + Atomic Design. Phase 1→2→3→4→5 순서 의존 관계 필수 준수. 기존 lib/validations.ts(Zod 스키마), types/index.ts(공통 타입), lib/constants.ts(상수), components/ui/(Shadcn) 최대 재활용."
+    }
+  ]
+}
