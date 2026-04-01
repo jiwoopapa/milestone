@@ -41,14 +41,14 @@ interface UseRoutinesReturn {
   refetch: () => Promise<void>;
 }
 
-export function useRoutines(): UseRoutinesReturn {
+export function useRoutines(selectedDate?: string): UseRoutinesReturn {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [logs, setLogs] = useState<RoutineLog[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAll = useCallback(async () => {
     const supabase = createClient();
-    const today = formatDate(getToday(), "yyyy-MM-dd");
+    const date = selectedDate ?? formatDate(getToday(), "yyyy-MM-dd");
 
     const [{ data: routineData }, { data: logData }] = await Promise.all([
       supabase
@@ -59,13 +59,13 @@ export function useRoutines(): UseRoutinesReturn {
       supabase
         .from("routine_logs")
         .select("*")
-        .eq("date", today),
+        .eq("date", date),
     ]);
 
     setRoutines(routineData ?? []);
     setLogs(logData ?? []);
     setLoading(false);
-  }, []);
+  }, [selectedDate]);
 
   useEffect(() => {
     fetchAll();

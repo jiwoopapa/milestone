@@ -61,7 +61,43 @@ export const registerFormSchema = z
     path: ["confirmPassword"],
   });
 
+// 루틴 폼 스키마
+export const routineFormSchema = z.object({
+  title: z.string().min(1, "루틴 이름을 입력해주세요.").max(100),
+  category: z.enum(["morning", "commute", "evening"], {
+    required_error: "시간대를 선택해주세요.",
+  }),
+  repeat_type: z.enum(["daily", "weekdays", "custom"], {
+    required_error: "반복 유형을 선택해주세요.",
+  }),
+  repeat_days: z.array(z.number().min(0).max(6)).optional(),
+});
+
+// 목표 폼 스키마
+export const goalFormSchema = z.object({
+  title: z.string().min(1, "목표 이름을 입력해주세요.").max(100),
+  unit: z.string().min(1, "단위를 입력해주세요.").max(20),
+  target_value: z.preprocess(
+    (v) => (v === "" ? undefined : Number(v)),
+    z.number().positive("목표값은 0보다 커야 합니다.")
+  ),
+  start_date: z.string().min(1, "시작일을 입력해주세요."),
+  end_date: z.string().optional(),
+});
+
+// 목표 기록 폼 스키마
+export const goalLogFormSchema = z.object({
+  value: z.preprocess(
+    (v) => (v === "" ? undefined : Number(v)),
+    z.number().positive("값은 0보다 커야 합니다.")
+  ),
+  note: z.string().max(200).optional(),
+});
+
 // 타입 추출
 export type ContactFormValues = z.infer<typeof contactFormSchema>;
 export type LoginFormValues = z.infer<typeof loginFormSchema>;
 export type RegisterFormValues = z.infer<typeof registerFormSchema>;
+export type RoutineFormValues = z.infer<typeof routineFormSchema>;
+export type GoalFormValues = z.infer<typeof goalFormSchema>;
+export type GoalLogFormValues = z.infer<typeof goalLogFormSchema>;
