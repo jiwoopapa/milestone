@@ -24,6 +24,14 @@ export const footerLinks = {
   ],
 } as const;
 
+// 앱 내부 네비게이션 링크
+export const appNavLinks = [
+  { href: "/dashboard", label: "대시보드", icon: "layout-dashboard" },
+  { href: "/goals", label: "목표 트래커", icon: "target" },
+  { href: "/calendar", label: "캘린더", icon: "calendar" },
+  { href: "/settings", label: "설정", icon: "settings" },
+] as const;
+
 // 소셜 링크
 export const socialLinks = [
   { name: "GitHub", href: "https://github.com", icon: "github" },
