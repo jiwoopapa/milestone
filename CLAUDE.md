@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Context
+
+- PRD 문서: @docs/PRD.md
+- 개발 로드맵: @docs/ROADMAP.md
+
 ## 프로젝트 개요
 
 Next.js 16, React 19, TypeScript를 사용하는 모던 웹 애플리케이션 스타터킷입니다. Shadcn/UI 컴포넌트와 Tailwind CSS v4를 활용하며, Atomic Design 패턴을 따릅니다.
