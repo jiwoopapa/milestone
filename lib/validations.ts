@@ -94,6 +94,15 @@ export const goalLogFormSchema = z.object({
   note: z.string().max(200).optional(),
 });
 
+// 이벤트 폼 스키마
+export const eventFormSchema = z.object({
+  title: z.string().min(1, "이벤트 이름을 입력해주세요.").max(100),
+  event_date: z.string().min(1, "날짜를 입력해주세요."),
+  category: z.enum(["hiking", "camping", "etc"], {
+    required_error: "카테고리를 선택해주세요.",
+  }),
+});
+
 // 타입 추출
 export type ContactFormValues = z.infer<typeof contactFormSchema>;
 export type LoginFormValues = z.infer<typeof loginFormSchema>;
@@ -101,3 +110,4 @@ export type RegisterFormValues = z.infer<typeof registerFormSchema>;
 export type RoutineFormValues = z.infer<typeof routineFormSchema>;
 export type GoalFormValues = z.infer<typeof goalFormSchema>;
 export type GoalLogFormValues = z.infer<typeof goalLogFormSchema>;
+export type EventFormValues = z.infer<typeof eventFormSchema>;
