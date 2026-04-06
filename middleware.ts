@@ -37,6 +37,13 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  // 루트 경로: 로그인 상태면 /dashboard, 아니면 /login으로 리다이렉트
+  if (pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = user ? "/dashboard" : "/login";
+    return NextResponse.redirect(url);
+  }
+
   // 보호 경로: 비로그인 시 /login으로 리다이렉트
   if (PROTECTED_PATHS.some((path) => pathname.startsWith(path))) {
     if (!user) {

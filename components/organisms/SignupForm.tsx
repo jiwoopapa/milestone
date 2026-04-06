@@ -20,6 +20,7 @@ import { createClient } from "@/lib/supabase/client";
 export function SignupForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -29,7 +30,7 @@ export function SignupForm() {
   async function onSubmit(values: RegisterFormValues) {
     setError(null);
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
       options: {
@@ -42,9 +43,23 @@ export function SignupForm() {
       return;
     }
 
-    // 이메일 인증이 비활성화된 경우 바로 대시보드로 이동
+    // session이 null이면 이메일 인증 대기 중
+    if (!data.session) {
+      setSuccess(true);
+      return;
+    }
+
     router.push("/dashboard");
     router.refresh();
+  }
+
+  if (success) {
+    return (
+      <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-center text-sm text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200">
+        <p className="font-medium">가입 완료!</p>
+        <p className="mt-1">이메일 받은 편지함에서 인증 링크를 클릭한 뒤 로그인하세요.</p>
+      </div>
+    );
   }
 
   return (
