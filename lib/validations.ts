@@ -65,10 +65,10 @@ export const registerFormSchema = z
 export const routineFormSchema = z.object({
   title: z.string().min(1, "루틴 이름을 입력해주세요.").max(100),
   category: z.enum(["morning", "commute", "evening"], {
-    required_error: "시간대를 선택해주세요.",
+    message: "시간대를 선택해주세요.",
   }),
   repeat_type: z.enum(["daily", "weekdays", "custom"], {
-    required_error: "반복 유형을 선택해주세요.",
+    message: "반복 유형을 선택해주세요.",
   }),
   repeat_days: z.array(z.number().min(0).max(6)).optional(),
 });
@@ -99,7 +99,7 @@ export const eventFormSchema = z.object({
   title: z.string().min(1, "이벤트 이름을 입력해주세요.").max(100),
   event_date: z.string().min(1, "날짜를 입력해주세요."),
   category: z.enum(["hiking", "camping", "etc"], {
-    required_error: "카테고리를 선택해주세요.",
+    message: "카테고리를 선택해주세요.",
   }),
 });
 

@@ -141,7 +141,7 @@ toast.promise(promise, {
               <Button
                 onClick={() => {
                   const promise = () =>
-                    new Promise((resolve) =>
+                    new Promise<{ name: string }>((resolve) =>
                       setTimeout(
                         () => resolve({ name: "사용자 데이터" }),
                         2000
