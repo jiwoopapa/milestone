@@ -7,7 +7,9 @@ import { RoutineCheckList } from "@/components/organisms/RoutineCheckList";
 import { RoutineFormDialog } from "@/components/organisms/RoutineFormDialog";
 import { AiCoachingPanel } from "@/components/organisms/AiCoachingPanel";
 import { useRoutines } from "@/hooks/useRoutines";
+import { useStreak } from "@/hooks/useStreak";
 import { formatDate, getToday } from "@/lib/date";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState(
@@ -16,6 +18,7 @@ export default function DashboardPage() {
 
   const { routines, logs, loading, create, update, remove, toggleComplete } =
     useRoutines(selectedDate);
+  const { currentStreak, bestStreak } = useStreak();
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
@@ -61,6 +64,27 @@ export default function DashboardPage() {
           <ChevronRight className="h-5 w-5" />
         </Button>
       </div>
+
+      {/* 스트릭 카드 */}
+      {(currentStreak > 0 || bestStreak > 0) && (
+        <Card>
+          <CardContent className="flex items-center justify-between py-3 px-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">🔥</span>
+              <div>
+                <p className="text-sm font-semibold">{currentStreak}일 연속</p>
+                <p className="text-xs text-muted-foreground">최장 {bestStreak}일</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">오늘 완료</p>
+              <p className="text-sm font-semibold">
+                {logs.length}/{routines.length}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* 루틴 체크리스트 */}
       {loading ? (
